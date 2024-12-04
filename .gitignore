@@ -1,0 +1,82 @@
+# Visual Studio files
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+*.vcxproj.filters
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+msbuild.log
+msbuild.err
+msbuild.wrn
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# NuGet
+*.nupkg
+**/packages/*
+!**/packages/build/
+*.nuget.props
+*.nuget.targets
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# IDE - JetBrains Rider
+.idea/
+*.sln.iml
+
+# Test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# Database files
+*.mdf
+*.ldf
+*.ndf
+
+# Log files
+*.log
+
+# Application Secrets
+appsettings.Development.json
+appsettings.Production.json
+*.pfx
+*.publishsettings
+**/Properties/launchSettings.json
+
+# Node.js (if using client-side libraries)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Others
+*.swp
+*.cache
+*.bak
+Thumbs.db
+Desktop.ini
+.DS_Store
