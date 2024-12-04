@@ -1,0 +1,196 @@
+﻿<div class="container-fluid px-4">
+    <h1 class="mt-4">@(Model.Id == null ? "Thêm mới" : "Chỉnh sửa") người dùng</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/Admin/Dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="/Admin/User">Người dùng</a></li>
+        <li class="breadcrumb-item active">@(Model.Id == null ? "Thêm mới" : "Chỉnh sửa")</li>
+    </ol>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-user-edit me-1"></i>
+            Thông tin người dùng
+        </div>
+        <div class="card-body">
+            <form method="post">
+                @Html.AntiForgeryToken()
+                @if (Model.Id != null)
+                {
+                    <input type="hidden" asp-for="Id" />
+                }
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label asp-for="UserName" class="control-label">Tên đăng nhập</label>
+                            <input asp-for="UserName" class="form-control" />
+                            <span asp-validation-for="UserName" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Email" class="control-label">Email</label>
+                            <input asp-for="Email" class="form-control" type="email" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        @if (Model.Id == null)
+                        {
+                            <div class="form-group mb-3">
+                                <label asp-for="Password" class="control-label">Mật khẩu</label>
+                                <input asp-for="Password" class="form-control" type="password" />
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label asp-for="ConfirmPassword" class="control-label">Xác nhận mật khẩu</label>
+                                <input asp-for="ConfirmPassword" class="form-control" type="password" />
+                                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label asp-for="FullName" class="control-label">Họ tên</label>
+                            <input asp-for="FullName" class="form-control" />
+                            <span asp-validation-for="FullName" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="PhoneNumber" class="control-label">Số điện thoại</label>
+                            <input asp-for="PhoneNumber" class="form-control" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Address" class="control-label">Địa chỉ</label>
+                            <textarea asp-for="Address" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="control-label">Vai trò</label>
+                            <div class="row">
+                                @foreach (var role in ViewBag.Roles)
+                                {
+                                    var isChecked = Model.Roles?.Contains(role.Name) ?? false;
+                                    <div class="col-md-6">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox"
+                                                   name="Roles"
+                                                   value="@role.Name"
+                                                   class="custom-control-input"
+                                            @(isChecked ? "checked" : "") />
+                                            <label class="custom-control-label">@role.Name</label>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <div class="custom-control custom-checkbox">
+                                <input asp-for="IsActive" class="custom-control-input" />
+                                <label asp-for="IsActive" class="custom-control-label">Tài khoản hoạt động</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Lưu
+                    </button>
+                    @if (Model.Id != null)
+                    {
+                        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                            <i class="fas fa-key"></i> Đổi mật khẩu
+                        </button>
+                    }
+                    <a href="@Url.Action("Index")" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Quay lại
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@if (Model.Id != null)
+{
+    <div class="modal fade" id="changePasswordModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Đổi mật khẩu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="changePasswordForm">
+                    <div class="modal-body">
+                        <div class="form-group mb-3">
+                            <label class="control-label">Mật khẩu mới</label>
+                            <input type="password" id="newPassword" class="form-control" required />
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="control-label">Xác nhận mật khẩu mới</label>
+                            <input type="password" id="confirmNewPassword" class="form-control" required />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Cập nhật mật khẩu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @if (Model.Id != null)
+    {
+        <script>
+            document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const newPassword = document.getElementById('newPassword').value;
+                const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
+                if (newPassword !== confirmNewPassword) {
+                    alert('Mật khẩu xác nhận không khớp');
+                    return;
+                }
+
+                fetch(`/Admin/User/ChangePassword/@Model.Id`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: JSON.stringify({ newPassword: newPassword })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Đổi mật khẩu thành công');
+                        bootstrap.Modal.getInstance(document.getElementById('changePasswordModal')).hide();
+                    } else {
+                        alert('Có lỗi xảy ra khi đổi mật khẩu');
+                    }
+                });
+            });
+        </script>
+    }
+
+    <script>
+        // Client-side validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const password = document.getElementById('Password')?.value;
+            const confirmPassword = document.getElementById('ConfirmPassword')?.value;
+
+            if (password && password !== confirmPassword) {
+                e.preventDefault();
+                alert('Mật khẩu xác nhận không khớp');
+            }
+        });
+    </script>
+}

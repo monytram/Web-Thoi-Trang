@@ -1,0 +1,142 @@
+﻿<div class="container-fluid px-4">
+    <h1 class="mt-4">@(Model.Id == 0 ? "Thêm mới" : "Chỉnh sửa") banner</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/Admin/Dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="/Admin/Banner">Banner</a></li>
+        <li class="breadcrumb-item active">@(Model.Id == 0 ? "Thêm mới" : "Chỉnh sửa")</li>
+    </ol>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-edit me-1"></i>
+            Thông tin banner
+        </div>
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                @if (Model.Id > 0)
+                {
+                    <input type="hidden" asp-for="Id" />
+                }
+
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="form-group mb-3">
+                            <label asp-for="Title" class="control-label">Tiêu đề</label>
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Link" class="control-label">Link liên kết</label>
+                            <input asp-for="Link" class="form-control" />
+                            <span asp-validation-for="Link" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="DisplayOrder" class="control-label">Thứ tự hiển thị</label>
+                                    <input asp-for="DisplayOrder" class="form-control" type="number" />
+                                    <span asp-validation-for="DisplayOrder" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="StartDate" class="control-label">Ngày bắt đầu</label>
+                                    <input asp-for="StartDate" class="form-control" type="date" />
+                                    <span asp-validation-for="StartDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="EndDate" class="control-label">Ngày kết thúc</label>
+                                    <input asp-for="EndDate" class="form-control" type="date" />
+                                    <span asp-validation-for="EndDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <div class="custom-control custom-checkbox">
+                                <input asp-for="IsActive" class="custom-control-input" />
+                                <label asp-for="IsActive" class="custom-control-label">Hiển thị banner</label>
+                            </div>
+                        </div>
+
+                        @{
+                            var selectedPositions = new List<string>();
+                            if (Model.BannerSettings != null)
+                            {
+                                foreach (var setting in Model.BannerSettings)
+                                {
+                                    selectedPositions.Add(setting.Position);
+                                }
+                            }
+                        }
+
+                        <div class="form-group mb-3">
+                            <label class="control-label">Vị trí hiển thị</label>
+                            <div class="row">
+                                @foreach (var position in ViewBag.BannerPositions)
+                                {
+                                    <div class="col-md-4">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox"
+                                                   name="Positions"
+                                                   value="@position"
+                                                   class="custom-control-input"
+                                            @(selectedPositions.Contains(position) ? "checked" : "") />
+                                            <label class="custom-control-label">@position</label>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label class="control-label">Hình ảnh</label>
+                            <input type="file" name="imageFile" class="form-control" accept="image/*" />
+
+                            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                            {
+                                <div class="mt-2">
+                                    <img src="@Model.ImageUrl" class="img-fluid" alt="Banner image" />
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Lưu
+                    </button>
+                    <a href="@Url.Action("Index")" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Quay lại
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Validate dates
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const startDate = new Date(document.getElementById('StartDate').value);
+            const endDate = new Date(document.getElementById('EndDate').value);
+
+            if (endDate < startDate) {
+                e.preventDefault();
+                alert('Ngày kết thúc phải lớn hơn ngày bắt đầu');
+            }
+        });
+    </script>
+}

@@ -1,0 +1,143 @@
+﻿<div class="container-fluid px-4">
+    <h1 class="mt-4">@(Model.Id == 0 ? "Thêm mới" : "Chỉnh sửa") sản phẩm</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/Admin/Dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="/Admin/Product">Sản phẩm</a></li>
+        <li class="breadcrumb-item active">@(Model.Id == 0 ? "Thêm mới" : "Chỉnh sửa")</li>
+    </ol>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-edit me-1"></i>
+            Thông tin sản phẩm
+        </div>
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                @if (Model.Id > 0)
+                {
+                    <input type="hidden" asp-for="Id" />
+                }
+
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="form-group mb-3">
+                            <label asp-for="Name" class="control-label">Tên sản phẩm</label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Description" class="control-label">Mô tả</label>
+                            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="CategoryId" class="control-label">Danh mục</label>
+                                    <select asp-for="CategoryId" class="form-select"
+                                            asp-items="@(new SelectList(Model.AvailableCategories, "Id", "Name"))">
+                                        <option value="">-- Chọn danh mục --</option>
+                                    </select>
+                                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="BasePrice" class="control-label">Giá gốc</label>
+                                    <input asp-for="BasePrice" class="form-control" />
+                                    <span asp-validation-for="BasePrice" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="DiscountType" class="control-label">Loại giảm giá</label>
+                                    <select asp-for="DiscountType" class="form-select">
+                                        <option value="">Không giảm giá</option>
+                                        <option value="percentage">Theo phần trăm</option>
+                                        <option value="fixed">Giảm trực tiếp</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="DiscountValue" class="control-label">Giá trị giảm</label>
+                                    <input asp-for="DiscountValue" class="form-control" />
+                                    <span asp-validation-for="DiscountValue" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <div class="custom-control custom-checkbox">
+                                <input asp-for="IsActive" class="custom-control-input" />
+                                <label asp-for="IsActive" class="custom-control-label">Hiển thị sản phẩm</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label class="control-label">Hình ảnh</label>
+                            <input type="file" name="images" multiple class="form-control" accept="image/*" />
+
+                            @if (Model.ProductImages != null && Model.ProductImages.Any())
+                            {
+                                <div class="row mt-3">
+                                    @foreach (var image in Model.ProductImages)
+                                    {
+                                        <div class="col-6 mb-2">
+                                            <div class="position-relative">
+                                                <img src="@image.ImageUrl" class="img-thumbnail" alt="Product image" />
+                                                <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0"
+                                                        onclick="deleteImage(@image.Id)">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Lưu
+                    </button>
+                    <a href="@Url.Action("Index")" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Quay lại
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function deleteImage(imageId) {
+            if (confirm('Bạn có chắc chắn muốn xóa ảnh này?')) {
+                fetch(`/Admin/Product/DeleteImage/${imageId}`, {
+                    method: 'POST',
+                    headers: {
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        alert('Có lỗi xảy ra khi xóa ảnh');
+                    }
+                });
+            }
+        }
+    </script>
+}

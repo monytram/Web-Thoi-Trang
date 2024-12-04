@@ -1,0 +1,12 @@
+﻿@{
+    if (Context.Request.Path.StartsWithSegments("/Admin/Auth"))
+    {
+        // Không set layout cho trang login
+        Layout = null;
+    }
+    else
+    {
+        // Set layout admin cho các trang khác
+        Layout = "_AdminLayout";
+    }
+}

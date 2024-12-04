@@ -1,0 +1,117 @@
+﻿@model WebThoiTrang.Areas.Admin.Models.AdminLoginViewModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body class="bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="card mt-5">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="text-center mb-0">Đăng nhập quản trị</h3>
+                    </div>
+                    <div class="card-body">
+
+                        <form id="loginForm" method="post"
+                              action="@Url.Action("Login", "Auth", new { area = "Admin" })"
+                              onsubmit="return handleSubmit(event)">
+                            @Html.AntiForgeryToken()
+
+                            <div class="form-group">
+                                <label for="Email">Email</label>
+                                <input type="email" id="Email" name="Email" class="form-control" value="@Model.Email" required />
+                                <span class="text-danger field-validation-valid" data-valmsg-for="Email"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="Password">Mật khẩu</label>
+                                <input type="password" id="Password" name="Password" class="form-control" required />
+                                <span class="text-danger field-validation-valid" data-valmsg-for="Password"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" id="RememberMe" name="RememberMe" class="custom-control-input" value="true" />
+                                    <label class="custom-control-label" for="RememberMe">Ghi nhớ đăng nhập</label>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-block">Đăng nhập</button>
+                        </form>
+
+                        @* Debug info *@
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                Form Action: @Url.Action("Login", "Auth", new { area = "Admin" })
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function handleSubmit(event) {
+            event.preventDefault();
+            //  const submitButton = document.querySelector('button[type="submit"]');
+            // submitButton.disabled = true;
+            // submitButton.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang xử lý...';
+    
+
+            // Log form data
+            console.log('Submitting form...');
+            console.log('Email:', document.getElementById('Email').value);
+            console.log('Password length:', document.getElementById('Password').value.length);
+
+            // Get form data
+            const formData = new FormData(document.getElementById('loginForm'));
+
+            // Submit form using fetch
+            fetch(document.getElementById('loginForm').action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                }
+            })
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    if (response.redirected) {
+                        window.location.href = response.url;
+                    } else if (response.ok) {
+                        response.text().then(html => {
+                            if (html.includes('Dashboard')) {
+                                window.location.href = '/Admin/Dashboard';
+                            } else {
+                                // Refresh the page to show validation errors
+                                document.open();
+                                document.write(html);
+                                document.close();
+                            }
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                })
+                // .finally(() => {
+                //     submitButton.disabled = false;
+                //     submitButton.innerHTML = 'Đăng nhập';
+                // });
+
+            return false;
+        }
+    </script>
+</body>
+</html>

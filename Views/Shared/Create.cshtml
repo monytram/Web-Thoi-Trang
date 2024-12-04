@@ -1,0 +1,26 @@
+﻿@model object
+@{
+    // Layout sẽ được xác định bởi _ViewStart.cshtml
+    ViewData["Title"] = "Thêm mới";
+}
+
+<div class="container">
+    <h2>Thêm mới @ViewContext.RouteData.Values["Controller"]</h2>
+    <hr />
+
+    <form method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="row">
+            <div class="col-md-8">
+                @RenderBody()
+            </div>
+        </div>
+
+        <div class="form-group mt-3">
+            <button type="submit" class="btn btn-primary">Lưu</button>
+            <a href="/@ViewContext.RouteData.Values["Controller"]"
+               class="btn btn-secondary">Quay lại</a>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,183 @@
+﻿<div class="container-fluid px-4">
+    <h1 class="mt-4">Quản lý đơn hàng</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/Admin/Dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item active">Đơn hàng</li>
+    </ol>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <i class="fas fa-shopping-cart me-1"></i>
+                    Danh sách đơn hàng
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <form method="get" class="d-flex">
+                        <input type="text" name="searchString" class="form-control me-2"
+                               placeholder="Tìm kiếm đơn hàng..." value="@ViewData["CurrentFilter"]">
+                        <button type="submit" class="btn btn-outline-primary">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                </div>
+                <div class="col-md-4">
+                    <select name="status" class="form-select" onchange="this.form.submit()">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="Pending">Chờ xác nhận</option>
+                        <option value="Processing">Đang xử lý</option>
+                        <option value="Shipped">Đang giao</option>
+                        <option value="Delivered">Đã giao</option>
+                        <option value="Cancelled">Đã hủy</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Mã đơn hàng</th>
+                            <th>Khách hàng</th>
+                            <th>Tổng tiền</th>
+                            <th>Phương thức thanh toán</th>
+                            <th>Trạng thái đơn hàng</th>
+                            <th>Trạng thái thanh toán</th>
+                            <th>Ngày đặt</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td>@item.Id</td>
+                                <td>@item.UserFullName</td>
+                                <td>@item.TotalAmount.ToString("N0") đ</td>
+                                <td>@item.PaymentMethod?.Name</td>
+                                <td>
+                                    @{
+                                        var statusClass = item.Status switch
+                                        {
+                                            "Pending" => "warning",
+                                            "Processing" => "info",
+                                            "Shipped" => "primary",
+                                            "Delivered" => "success",
+                                            "Cancelled" => "danger",
+                                            _ => "secondary"
+                                        };
+                                    }
+                                    <span class="badge bg-@statusClass">@item.Status</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-@(item.PaymentStatus == "Paid" ? "success" : "warning")">
+                                        @item.PaymentStatus
+                                    </span>
+                                </td>
+                                <td>@item.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="@Url.Action("Details", new { id = item.Id })"
+                                           class="btn btn-sm btn-info">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-primary dropdown-toggle"
+                                                data-bs-toggle="dropdown">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <button class="dropdown-item"
+                                                        onclick="updateStatus(@item.Id, 'Processing')">
+                                                    Xác nhận đơn
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button class="dropdown-item"
+                                                        onclick="updateStatus(@item.Id, 'Shipped')">
+                                                    Đang giao hàng
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button class="dropdown-item"
+                                                        onclick="updateStatus(@item.Id, 'Delivered')">
+                                                    Đã giao hàng
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button class="dropdown-item text-danger"
+                                                        onclick="updateStatus(@item.Id, 'Cancelled')">
+                                                    Hủy đơn hàng
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (Model.TotalPages > 1)
+            {
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        @if (Model.HasPreviousPage)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("Index", new { pageNumber = Model.PageIndex - 1 })">
+                                    Previous
+                                </a>
+                            </li>
+                        }
+
+                        @for (var i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("Index", new { pageNumber = i })">@i</a>
+                            </li>
+                        }
+
+                        @if (Model.HasNextPage)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("Index", new { pageNumber = Model.PageIndex + 1 })">
+                                    Next
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function updateStatus(orderId, status) {
+            if (confirm(`Bạn có chắc chắn muốn chuyển đơn hàng sang trạng thái ${status}?`)) {
+                fetch(`/Admin/Order/UpdateStatus/${orderId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: `status=${status}`
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        alert('Có lỗi xảy ra khi cập nhật trạng thái đơn hàng');
+                    }
+                });
+            }
+        }
+    </script>
+}

@@ -1,0 +1,135 @@
+﻿<div class="container-fluid px-4">
+    <h1 class="mt-4">Cài đặt hệ thống</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/Admin/Dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item active">Cài đặt</li>
+    </ol>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-cog me-1"></i>
+                    Cấu hình chung
+                </div>
+                <div class="card-body">
+                    <form method="post" id="settingsForm">
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-4">
+                            <h5>Thông tin cửa hàng</h5>
+                            <div class="form-group mb-3">
+                                <label class="form-label">Tên cửa hàng</label>
+                                <input type="text" name="StoreName" class="form-control"
+                                       value="@Model.GetValue("StoreName")" />
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="form-label">Địa chỉ</label>
+                                <input type="text" name="StoreAddress" class="form-control"
+                                       value="@Model.GetValue("StoreAddress")" />
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="form-label">Số điện thoại</label>
+                                <input type="text" name="StorePhone" class="form-control"
+                                       value="@Model.GetValue("StorePhone")" />
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" name="StoreEmail" class="form-control"
+                                       value="@Model.GetValue("StoreEmail")" />
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h5>Cài đặt đơn hàng</h5>
+                            <div class="form-group mb-3">
+                                <label class="form-label">Phí vận chuyển mặc định</label>
+                                <input type="number" name="DefaultShippingFee" class="form-control"
+                                       value="@Model.GetValue("DefaultShippingFee")" />
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="form-label">Đơn hàng tối thiểu miễn phí vận chuyển</label>
+                                <input type="number" name="FreeShippingThreshold" class="form-control"
+                                       value="@Model.GetValue("FreeShippingThreshold")" />
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h5>Cài đặt Email</h5>
+                            <div class="form-group mb-3">
+                                <label class="form-label">SMTP Server</label>
+                                <input type="text" name="SmtpServer" class="form-control"
+                                       value="@Model.GetValue("SmtpServer")" />
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="form-label">SMTP Port</label>
+                                <input type="number" name="SmtpPort" class="form-control"
+                                       value="@Model.GetValue("SmtpPort")" />
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="form-label">SMTP Username</label>
+                                <input type="text" name="SmtpUsername" class="form-control"
+                                       value="@Model.GetValue("SmtpUsername")" />
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="form-label">SMTP Password</label>
+                                <input type="password" name="SmtpPassword" class="form-control"
+                                       value="@Model.GetValue("SmtpPassword")" />
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Lưu cài đặt
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Thông tin hệ thống
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>Phiên bản:</strong> @Model.GetValue("Version")
+                    </div>
+                    <div class="mb-3">
+                        <strong>Cập nhật lần cuối:</strong>
+                        @{
+                            var lastUpdated = Model.GetDateTime("UpdatedAt");
+                            @(lastUpdated.HasValue ? lastUpdated.Value.ToString("dd/MM/yyyy HH:mm") : "Chưa cập nhật")
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('settingsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            fetch('/Admin/Setting/Update', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Lưu cài đặt thành công');
+                    window.location.reload();
+                } else {
+                    alert('Có lỗi xảy ra khi lưu cài đặt');
+                }
+            });
+        });
+    </script>
+}
